@@ -75,7 +75,7 @@ class ProcessOrdersFile extends Command
 
             //Storage::disk('edi')->move("translate/{$fileName}", "translate_process/{$fileName}");
             //$logData[] = $this->generateLogMessage("Processed successfully: {$fileName} - Moved to translate_process - File has been generated 850_EXP.CIM in data_in.");
-            $this->logToFile($logFilePath, $logData);
+            //$this->logToFile($logFilePath, $logData);
         }
 
         return Command::SUCCESS;
