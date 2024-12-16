@@ -24,7 +24,6 @@ class TranslateWalmart extends Command
             return Command::FAILURE;
         }
 
-        // Genera el archivo en el disco 'edi'
         $outputFilePath = 'data_in/850_EXP.CIM';
 
         $outputData = [];

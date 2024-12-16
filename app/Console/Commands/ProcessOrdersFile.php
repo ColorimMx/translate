@@ -33,7 +33,6 @@ class ProcessOrdersFile extends Command
                 $logData[] = $this->generateLogMessage("Error: {$fileName} - 850_EXP.CIM exists in data_in. Moving to translate_error.
             Process the file in Syteline form EDI Transaction Load Routine or delete the file to generate 850_EXP.CIM again");
                 $this->logToFile($logFilePath, $logData);
-                // Mueve el archivo INF a la subcarpeta errores_ordenes_inf
                 Storage::disk('edi')->move("translate/{$fileName}", "translate_error/{$fileName}");
                 continue;
             }
@@ -53,21 +52,29 @@ class ProcessOrdersFile extends Command
                 $this->info("Condition 1 met: {$firstColumn} Orden de Nadro");
                 $this->call('app:translate-nadro', ['filePath' => $inputFilePath]);
                 $logData[] = $this->generateLogMessage("Nadro met: {$fileName} - Orden de Nadro");
+                $logData[] = $this->generateLogMessage("Processed successfully: {$fileName} - Moved to translate_process - File has been generated 850_EXP.CIM in data_in.");
+                Storage::disk('edi')->move("translate/{$fileName}", "translate_process/Nadro/{$fileName}");
             } elseif ($firstColumn === '010850 001') {
                 $this->info("Condition 2 met: {$firstColumn} Orden de Walmart");
                 $this->call('app:translate-walmart', ['filePath' => $inputFilePath]);
                 $logData[] = $this->generateLogMessage("Walmart met: {$fileName} - Orden de Walmart");
+                $logData[] = $this->generateLogMessage("Processed successfully: {$fileName} - Moved to translate_process - File has been generated 850_EXP.CIM in data_in.");
+                Storage::disk('edi')->move("translate/{$fileName}", "translate_process/Walmart/{$fileName}");
             } elseif ($firstColumn === '026850 002') {
                 $this->info("Condition 3 met: {$firstColumn} Orden de Chedraui");
                 $this->call('app:translate-chedraui', ['filePath' => $inputFilePath]);
                 $logData[] = $this->generateLogMessage("Chedraui met: {$fileName} - Orden de Chedraui");
+                $logData[] = $this->generateLogMessage("Processed successfully: {$fileName} - Moved to translate_process - File has been generated 850_EXP.CIM in data_in.");
+                Storage::disk('edi')->move("translate/{$fileName}", "translate_process/Chedraui/{$fileName}");
             } else {
                 $this->warn("No conditions met for: {$firstColumn}");
                 $logData[] = $this->generateLogMessage("No conditions met: {$fileName}");
+                $logData[] = $this->generateLogMessage("Processed no successfully: {$fileName} - Moved to translate_error.");
+                Storage::disk('edi')->move("translate/{$fileName}", "translate_error/{$fileName}");
             }
 
-            Storage::disk('edi')->move("translate/{$fileName}", "translate_process/{$fileName}");
-            $logData[] = $this->generateLogMessage("Processed successfully: {$fileName} - Moved to translate_process - File has been generated 850_EXP.CIM in data_in.");
+            //Storage::disk('edi')->move("translate/{$fileName}", "translate_process/{$fileName}");
+            //$logData[] = $this->generateLogMessage("Processed successfully: {$fileName} - Moved to translate_process - File has been generated 850_EXP.CIM in data_in.");
             $this->logToFile($logFilePath, $logData);
         }
 
