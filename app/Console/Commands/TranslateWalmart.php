@@ -90,8 +90,11 @@ class TranslateWalmart extends Command
             $outputData[] = $line2;
         }
 
-        // Guarda el archivo en el disco 'edi' usando Storage
         Storage::disk('edi')->put($outputFilePath, implode('', $outputData));
+
+        $fileFullPath = Storage::disk('edi')->path($outputFilePath);
+        chmod($fileFullPath, 0664);
+
         $this->info("Data processed successfully and written to {$outputFilePath}");
 
         return Command::SUCCESS;
