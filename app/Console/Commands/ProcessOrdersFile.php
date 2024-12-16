@@ -31,7 +31,7 @@ class ProcessOrdersFile extends Command
 
             if (Storage::disk('edi')->exists('data_in/850_EXP.CIM')) {
                 $logData[] = $this->generateLogMessage("Error: {$fileName} - 850_EXP.CIM exists in data_in. Moving to translate_error.
-                Process the file in Syteline form EDI Transaction Load Routine or delete the file to generate 850_EXP_CIM again");
+            Process the file in Syteline form EDI Transaction Load Routine or delete the file to generate 850_EXP.CIM again");
                 $this->logToFile($logFilePath, $logData);
                 // Mueve el archivo INF a la subcarpeta errores_ordenes_inf
                 Storage::disk('edi')->move("translate/{$fileName}", "translate_error/{$fileName}");
