@@ -37,23 +37,32 @@ class TranslateChedraui extends Command
 
         $groupedItems = [];
 
-        // Agrupar artículos y totalizar cantidades multiplicadas
+        // Agrupar artículos y totalizar cantidades sin duplicaciones incorrectas
         foreach (array_slice($lines, 1) as $line) {
             $columns = str_getcsv($line);
 
-            if (count($columns) < 6) {
-                $this->error("A line has fewer than 6 columns: {$line}");
+            if (count($columns) < 15) { // Validar número mínimo de columnas
+                $this->error("A line has fewer than 15 columns: {$line}");
                 continue;
             }
 
             $currentOrder = $columns[0];
             $articleCode = $columns[5];
-            $quantity = $columns[8] * $columns[14]; // Realizar la multiplicación
 
+            // Convertir las columnas a valores numéricos
+            //$quantityBase = (float)$columns[8];
+            //$factor = (float)$columns[14];
+            //$quantity = $quantityBase * $factor;
+
+            $quantityBase = (float)$columns[14];
+            $quantity = $quantityBase;
+
+            // Si no existe el pedido, inicializar
             if (!isset($groupedItems[$currentOrder])) {
                 $groupedItems[$currentOrder] = [];
             }
 
+            // Si no existe el artículo dentro del pedido, inicializar
             if (!isset($groupedItems[$currentOrder][$articleCode])) {
                 $groupedItems[$currentOrder][$articleCode] = [
                     'columns' => $columns,
@@ -61,7 +70,8 @@ class TranslateChedraui extends Command
                 ];
             }
 
-            $groupedItems[$currentOrder][$articleCode]['totalQuantity'] += $quantity; // Totalizar
+            // Sumar cantidad total correctamente
+            $groupedItems[$currentOrder][$articleCode]['totalQuantity'] += $quantity;
         }
 
         // Generar líneas de salida
@@ -96,7 +106,7 @@ class TranslateChedraui extends Command
                     str_pad('', 31) .
                     str_pad(substr($articleCode, 0, 30), 30) .
                     str_pad('', 30) .
-                    str_pad(str_pad($data['totalQuantity'], 9, '0', STR_PAD_LEFT), 9) . // Cantidad totalizada
+                    str_pad(str_pad((int)$data['totalQuantity'], 9, '0', STR_PAD_LEFT), 9) . // Cantidad total sin ceros adicionales
                     str_pad(substr('PZ', 0, 2), 2) .
                     $priceFormatted .
                     str_pad('', 2) .
